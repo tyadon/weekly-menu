@@ -164,21 +164,30 @@ export default function WeeklyMenuPlanner() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-        <div className="ml-3 text-gray-600 font-medium">Loading your menu...</div>
+      <div className="flex flex-col items-center justify-center py-16 animate-fade-in">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-white/30 rounded-full animate-spin border-t-white"></div>
+          <div className="absolute inset-0 w-16 h-16 border-4 border-transparent rounded-full border-t-orange-300 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+        </div>
+        <div className="mt-6 text-white/90 font-medium text-lg text-shadow">Preparing your menu...</div>
       </div>
     );
   }
 
   if (!menu) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-          <div className="text-red-600 font-medium text-lg">Failed to load menu</div>
+      <div className="flex items-center justify-center py-16 animate-fade-in">
+        <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-3xl p-8 text-center shadow-xl max-w-sm mx-auto">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <div className="text-gray-900 font-semibold text-lg mb-2">Unable to load menu</div>
+          <p className="text-gray-600 mb-6">Something went wrong while loading your weekly menu.</p>
           <button 
             onClick={loadMenu}
-            className="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+            className="w-full px-6 py-3 bg-gradient-to-r from-orange-400 to-yellow-400 text-white font-semibold rounded-2xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
           >
             Try Again
           </button>
@@ -188,51 +197,52 @@ export default function WeeklyMenuPlanner() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Week Navigation Bar */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+    <div className="space-y-8 animate-fade-in">
+      {/* Week Navigation */}
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-4 sm:p-6 shadow-xl border border-white/20 max-w-2xl mx-auto animate-slide-up">
         <div className="flex items-center justify-between">
           {/* Previous Week */}
           <button
             onClick={navigateToPreviousWeek}
-            className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors group"
+            className="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 sm:py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-2xl transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-300"
           >
-            <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span className="font-medium">Last Week</span>
+            <span className="font-medium text-sm sm:text-base">Previous</span>
           </button>
 
           {/* Current Week Display */}
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-900">
-              {isCurrentWeek ? "This Week's Menu" : "Weekly Menu"}
+          <div className="text-center px-2">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              {isCurrentWeek ? "This Week" : "Weekly Menu"}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">{weekRangeText}</p>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1 font-medium">{weekRangeText}</p>
           </div>
 
           {/* Next Week */}
           <button
             onClick={navigateToNextWeek}
-            className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors group"
+            className="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 sm:py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-2xl transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-300"
           >
-            <span className="font-medium">Next Week</span>
-            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span className="font-medium text-sm sm:text-base">Next</span>
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Days Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {menu.days.map((day) => (
+      {/* Weekly Menu Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 px-4 sm:px-0 animate-slide-up">
+        {menu.days.map((day, index) => (
           <DayCard
             key={day.date}
             day={day}
             isToday={day.date === today}
             onMealChange={updateMeal}
             saveStatuses={saveStatuses}
+            delay={index * 100}
           />
         ))}
       </div>
@@ -245,40 +255,45 @@ interface DayCardProps {
   isToday: boolean;
   onMealChange: (dayDate: string, mealType: 'lunch' | 'dinner', value: string) => void;
   saveStatuses: Record<string, SaveStatus>;
+  delay: number;
 }
 
-function DayCard({ day, isToday, onMealChange, saveStatuses }: DayCardProps) {
+function DayCard({ day, isToday, onMealChange, saveStatuses, delay }: DayCardProps) {
   const getSaveStatus = (mealType: 'lunch' | 'dinner') => {
     return saveStatuses[`${day.date}-${mealType}`];
   };
 
   return (
-    <div className={`
-      bg-white rounded-2xl p-6 shadow-sm border transition-all duration-300 hover:shadow-md
-      ${isToday 
-        ? 'border-green-300 bg-green-50 ring-2 ring-green-200' 
-        : 'border-gray-200 hover:border-gray-300'
-      }
-    `}>
+    <div 
+      className={`
+        bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl border transition-all duration-300 hover:shadow-2xl transform hover:scale-[1.02]
+        ${isToday 
+          ? 'border-orange-300 bg-gradient-to-br from-orange-50 to-yellow-50 ring-2 ring-orange-200' 
+          : 'border-white/20 hover:border-orange-200'
+        }
+        animate-fade-in
+      `}
+      style={{ animationDelay: `${delay}ms` }}
+    >
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <div className="flex items-center justify-between mb-2">
-          <h3 className={`font-bold text-xl ${isToday ? 'text-green-800' : 'text-gray-900'}`}>
+          <h3 className={`font-bold text-lg sm:text-xl ${isToday ? 'text-orange-800' : 'text-gray-900'}`}>
             {day.dayName}
           </h3>
           {isToday && (
-            <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+            <div className="bg-gradient-to-r from-orange-400 to-yellow-400 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-semibold">
               Today
             </div>
           )}
         </div>
-        <p className={`text-sm font-medium ${isToday ? 'text-green-600' : 'text-gray-500'}`}>
+        <p className={`text-xs sm:text-sm font-medium ${isToday ? 'text-orange-600' : 'text-gray-500'}`}>
           {day.displayDate}
         </p>
       </div>
 
       {/* Meals */}
-      <div className="space-y-5">
+      <div className="space-y-4 sm:space-y-5">
         <MealInput
           label="Lunch"
           value={day.meals.lunch}
@@ -310,7 +325,7 @@ interface MealInputProps {
 function MealInput({ label, value, onChange, saveStatus, isToday }: MealInputProps) {
   return (
     <div>
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
         <label className="block text-sm font-semibold text-gray-700">
           {label}
         </label>
@@ -333,12 +348,12 @@ function MealInput({ label, value, onChange, saveStatus, isToday }: MealInputPro
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full p-3 border rounded-xl resize-none transition-all duration-200 text-sm
+        className={`w-full p-3 sm:p-4 border rounded-xl sm:rounded-2xl resize-none transition-all duration-200 text-sm font-medium touch-manipulation
           ${isToday 
-            ? 'border-green-200 focus:ring-2 focus:ring-green-300 focus:border-green-400 bg-green-50/50' 
-            : 'border-gray-200 focus:ring-2 focus:ring-amber-200 focus:border-amber-300'
+            ? 'border-orange-200 focus:ring-2 focus:ring-orange-300 focus:border-orange-400 bg-orange-50/50' 
+            : 'border-gray-200 focus:ring-2 focus:ring-orange-200 focus:border-orange-300 bg-white/80'
           }
-          placeholder-gray-400 focus:outline-none
+          placeholder-gray-400 focus:outline-none hover:border-orange-200
         `}
         rows={3}
         placeholder={`What's for ${label.toLowerCase()}?`}
