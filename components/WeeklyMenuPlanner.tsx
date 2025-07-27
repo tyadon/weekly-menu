@@ -358,7 +358,9 @@ export default function WeeklyMenuPlanner() {
               ...day,
               meals: {
                 ...day.meals,
-                [recipeField]: recipe
+                [recipeField]: recipe,
+                // If recipe has a title, set it as the meal description
+                ...(recipe.title && { [mealType]: recipe.title })
               }
             }
           : day
