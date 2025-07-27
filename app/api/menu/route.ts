@@ -33,7 +33,9 @@ function createEmptyWeeklyMenu(mondayDate: Date): WeeklyMenu {
       displayDate: `${date.getMonth() + 1}/${date.getDate()}`,
       meals: {
         lunch: '',
-        dinner: ''
+        dinner: '',
+        lunchRecipe: undefined,
+        dinnerRecipe: undefined
       }
     });
   }

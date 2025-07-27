@@ -1,6 +1,14 @@
+export interface Recipe {
+  title?: string;
+  ingredients: string;
+  instructions: string;
+}
+
 export interface MealData {
   lunch: string;
   dinner: string;
+  lunchRecipe?: Recipe;
+  dinnerRecipe?: Recipe;
 }
 
 export interface DayMenu {
