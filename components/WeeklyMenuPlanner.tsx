@@ -3,23 +3,67 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { WeeklyMenu, DayMenu, SaveStatus } from '@/types/menu';
 
+// Helper function to get Monday of a week, given any date in that week
+function getMondayOfWeek(date: Date): Date {
+  const result = new Date(date);
+  const day = result.getDay();
+  const diff = result.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+  result.setDate(diff);
+  result.setHours(0, 0, 0, 0);
+  return result;
+}
+
+// Helper function to add weeks to a date
+function addWeeks(date: Date, weeks: number): Date {
+  const result = new Date(date);
+  result.setDate(result.getDate() + (weeks * 7));
+  return result;
+}
+
+// Helper function to format week range display
+function formatWeekRange(mondayDate: Date): string {
+  const sunday = addWeeks(mondayDate, 0);
+  sunday.setDate(mondayDate.getDate() + 6);
+  
+  const startMonth = mondayDate.toLocaleDateString('en-US', { month: 'short' });
+  const startDate = mondayDate.getDate();
+  const endMonth = sunday.toLocaleDateString('en-US', { month: 'short' });
+  const endDate = sunday.getDate();
+  const year = mondayDate.getFullYear();
+  
+  if (startMonth === endMonth) {
+    return `${startMonth} ${startDate}-${endDate}, ${year}`;
+  } else {
+    return `${startMonth} ${startDate} - ${endMonth} ${endDate}, ${year}`;
+  }
+}
+
 export default function WeeklyMenuPlanner() {
   const [menu, setMenu] = useState<WeeklyMenu | null>(null);
   const [saveStatuses, setSaveStatuses] = useState<Record<string, SaveStatus>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [weekOffset, setWeekOffset] = useState(0); // 0 = this week, -1 = last week, +1 = next week
   const saveTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({});
 
   // Get today's date string for highlighting
   const today = new Date().toISOString().split('T')[0];
 
-  // Load menu data on initial render
+  // Calculate the current week we're viewing
+  const thisWeekMonday = getMondayOfWeek(new Date());
+  const currentViewMonday = addWeeks(thisWeekMonday, weekOffset);
+  const weekRangeText = formatWeekRange(currentViewMonday);
+  const isCurrentWeek = weekOffset === 0;
+
+  // Load menu data when week changes
   useEffect(() => {
     loadMenu();
-  }, []);
+  }, [weekOffset]);
 
   const loadMenu = async () => {
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/menu');
+      const weekStartStr = currentViewMonday.toISOString().split('T')[0];
+      const response = await fetch(`/api/menu?week=${weekStartStr}`);
       if (response.ok) {
         const menuData = await response.json();
         setMenu(menuData);
@@ -53,6 +97,15 @@ export default function WeeklyMenuPlanner() {
       console.error('Error saving menu:', error);
       return false;
     }
+  }, []);
+
+  // Navigation handlers
+  const navigateToPreviousWeek = useCallback(() => {
+    setWeekOffset(prev => prev - 1);
+  }, []);
+
+  const navigateToNextWeek = useCallback(() => {
+    setWeekOffset(prev => prev + 1);
   }, []);
 
   const updateMeal = useCallback((dayDate: string, mealType: 'lunch' | 'dinner', value: string) => {
@@ -134,35 +187,40 @@ export default function WeeklyMenuPlanner() {
     );
   }
 
-  // Calculate completion percentage
-  const totalMeals = menu.days.length * 2; // lunch + dinner for each day
-  const completedMeals = menu.days.reduce((count, day) => {
-    return count + (day.meals.lunch ? 1 : 0) + (day.meals.dinner ? 1 : 0);
-  }, 0);
-  const completionPercentage = Math.round((completedMeals / totalMeals) * 100);
-
   return (
     <div className="space-y-6">
-      {/* Week Summary Card */}
+      {/* Week Navigation Bar */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">This Week's Menu</h2>
-          <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-600">
-              {completedMeals}/{totalMeals} meals planned
-            </div>
-            <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-              {completionPercentage}% Complete
-            </div>
+        <div className="flex items-center justify-between">
+          {/* Previous Week */}
+          <button
+            onClick={navigateToPreviousWeek}
+            className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors group"
+          >
+            <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="font-medium">Last Week</span>
+          </button>
+
+          {/* Current Week Display */}
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-900">
+              {isCurrentWeek ? "This Week's Menu" : "Weekly Menu"}
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">{weekRangeText}</p>
           </div>
-        </div>
-        
-        {/* Progress Bar */}
-        <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-          <div 
-            className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500 ease-out" 
-            style={{ width: `${completionPercentage}%` }}
-          ></div>
+
+          {/* Next Week */}
+          <button
+            onClick={navigateToNextWeek}
+            className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors group"
+          >
+            <span className="font-medium">Next Week</span>
+            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -194,9 +252,6 @@ function DayCard({ day, isToday, onMealChange, saveStatuses }: DayCardProps) {
     return saveStatuses[`${day.date}-${mealType}`];
   };
 
-  const mealsCompleted = (day.meals.lunch ? 1 : 0) + (day.meals.dinner ? 1 : 0);
-  const progressPercentage = (mealsCompleted / 2) * 100;
-
   return (
     <div className={`
       bg-white rounded-2xl p-6 shadow-sm border transition-all duration-300 hover:shadow-md
@@ -220,22 +275,6 @@ function DayCard({ day, isToday, onMealChange, saveStatuses }: DayCardProps) {
         <p className={`text-sm font-medium ${isToday ? 'text-green-600' : 'text-gray-500'}`}>
           {day.displayDate}
         </p>
-        
-        {/* Day Progress */}
-        <div className="mt-3">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-gray-600">{mealsCompleted}/2 meals</span>
-            <span className="text-xs text-gray-600">{Math.round(progressPercentage)}%</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-1.5">
-            <div 
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                isToday ? 'bg-green-500' : 'bg-amber-400'
-              }`}
-              style={{ width: `${progressPercentage}%` }}
-            ></div>
-          </div>
-        </div>
       </div>
 
       {/* Meals */}

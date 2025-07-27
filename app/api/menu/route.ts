@@ -2,34 +2,30 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { WeeklyMenu } from '@/types/menu';
 
 // Fallback in-memory storage for local development
-let memoryStore: WeeklyMenu | null = null;
-
-const MENU_KEY = 'menu:current';
+let memoryStore: Record<string, WeeklyMenu> = {};
 
 // Check if we're in development and KV variables are missing
 const isDevelopment = process.env.NODE_ENV === 'development';
 const hasKvVars = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN;
 
-// Helper function to get the start of the current week (Monday)
-function getCurrentWeekStart(): Date {
-  const now = new Date();
-  const day = now.getDay();
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-  const monday = new Date(now.setDate(diff));
-  monday.setHours(0, 0, 0, 0);
-  return monday;
+// Helper function to get Monday of a week, given any date in that week
+function getMondayOfWeek(date: Date): Date {
+  const result = new Date(date);
+  const day = result.getDay();
+  const diff = result.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+  result.setDate(diff);
+  result.setHours(0, 0, 0, 0);
+  return result;
 }
 
-// Helper function to create an empty weekly menu
-function createEmptyWeeklyMenu(): WeeklyMenu {
-  const weekStart = getCurrentWeekStart();
+// Helper function to create an empty weekly menu for a specific Monday
+function createEmptyWeeklyMenu(mondayDate: Date): WeeklyMenu {
   const days = [];
-  
   const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   
   for (let i = 0; i < 7; i++) {
-    const date = new Date(weekStart);
-    date.setDate(weekStart.getDate() + i);
+    // Create date by adding days to the Monday date more explicitly
+    const date = new Date(mondayDate.getFullYear(), mondayDate.getMonth(), mondayDate.getDate() + i);
     
     days.push({
       date: date.toISOString().split('T')[0],
@@ -43,37 +39,35 @@ function createEmptyWeeklyMenu(): WeeklyMenu {
   }
   
   return {
-    weekStart: weekStart.toISOString().split('T')[0],
+    weekStart: mondayDate.toISOString().split('T')[0],
     days
   };
 }
 
 // KV operations with fallback
-async function getFromStorage(): Promise<WeeklyMenu | null> {
+async function getFromStorage(weekKey: string): Promise<WeeklyMenu | null> {
   if (isDevelopment && !hasKvVars) {
-    // Use memory storage for local development
-    return memoryStore;
+    return memoryStore[weekKey] || null;
   }
   
   try {
     const { kv } = await import('@vercel/kv');
-    return await kv.get<WeeklyMenu>(MENU_KEY);
+    return await kv.get<WeeklyMenu>(weekKey);
   } catch (error) {
     console.error('KV Error:', error);
     return null;
   }
 }
 
-async function setToStorage(menu: WeeklyMenu): Promise<boolean> {
+async function setToStorage(weekKey: string, menu: WeeklyMenu): Promise<boolean> {
   if (isDevelopment && !hasKvVars) {
-    // Use memory storage for local development
-    memoryStore = menu;
+    memoryStore[weekKey] = menu;
     return true;
   }
   
   try {
     const { kv } = await import('@vercel/kv');
-    await kv.set(MENU_KEY, menu);
+    await kv.set(weekKey, menu);
     return true;
   } catch (error) {
     console.error('KV Error:', error);
@@ -81,14 +75,31 @@ async function setToStorage(menu: WeeklyMenu): Promise<boolean> {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    let menu = await getFromStorage();
+    const { searchParams } = new URL(request.url);
+    const weekParam = searchParams.get('week');
     
-    // If no menu exists or it's from a different week, create a new one
-    if (!menu || menu.weekStart !== getCurrentWeekStart().toISOString().split('T')[0]) {
-      menu = createEmptyWeeklyMenu();
-      await setToStorage(menu);
+    let mondayDate: Date;
+    
+    if (weekParam) {
+      // Frontend is sending us the Monday date directly, parse it carefully
+      const [year, month, day] = weekParam.split('-').map(Number);
+      mondayDate = new Date(year, month - 1, day); // month is 0-indexed
+      mondayDate.setHours(0, 0, 0, 0);
+    } else {
+      // No week specified, calculate current week's Monday
+      mondayDate = getMondayOfWeek(new Date());
+    }
+    
+    const weekKey = `menu:${mondayDate.toISOString().split('T')[0]}`;
+    
+    let menu = await getFromStorage(weekKey);
+    
+    // If no menu exists for this week, create a new one
+    if (!menu) {
+      menu = createEmptyWeeklyMenu(mondayDate);
+      await setToStorage(weekKey, menu);
     }
     
     return NextResponse.json(menu);
@@ -113,7 +124,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const success = await setToStorage(menu);
+    const weekKey = `menu:${menu.weekStart}`;
+    const success = await setToStorage(weekKey, menu);
     
     if (success) {
       return NextResponse.json({ success: true });
