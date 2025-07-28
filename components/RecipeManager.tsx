@@ -374,18 +374,18 @@ function RecipeCard({ recipe, onEdit, onView, onDelete, isEditing, onSave, onCan
 
   if (isEditing) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
+      <div className="card p-6 space-y-4">
         <input
           type="text"
           value={editData.title}
           onChange={(e) => setEditData(prev => ({ ...prev, title: e.target.value }))}
-          className="w-full p-2 border border-gray-200 rounded-lg text-sm font-semibold"
+          className="input-field text-sm font-semibold"
         />
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-3">
           <select
             value={editData.cookingTime}
             onChange={(e) => setEditData(prev => ({ ...prev, cookingTime: e.target.value }))}
-            className="p-2 border border-gray-200 rounded-lg text-xs"
+            className="input-field text-xs"
           >
             <option value="15 min">15 min</option>
             <option value="20 min">20 min</option>
@@ -397,29 +397,29 @@ function RecipeCard({ recipe, onEdit, onView, onDelete, isEditing, onSave, onCan
             type="number"
             value={editData.servings}
             onChange={(e) => setEditData(prev => ({ ...prev, servings: parseInt(e.target.value) || 4 }))}
-            className="p-2 border border-gray-200 rounded-lg text-xs"
+            className="input-field text-xs"
             min="1" max="20"
           />
         </div>
         <select
           value={editData.category}
           onChange={(e) => setEditData(prev => ({ ...prev, category: e.target.value }))}
-          className="w-full p-2 border border-gray-200 rounded-lg text-xs"
+          className="input-field text-xs"
         >
           {defaultCategories.both.map(cat => (
             <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
           ))}
         </select>
-        <div className="flex space-x-2">
+        <div className="flex space-x-3">
           <button
             onClick={handleSave}
-            className="flex-1 px-3 py-2 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700"
+            className="flex-1 btn-primary text-sm py-2 px-3"
           >
             Save
           </button>
           <button
             onClick={onCancelEdit}
-            className="flex-1 px-3 py-2 bg-gray-300 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-400"
+            className="flex-1 btn-secondary text-sm py-2 px-3"
           >
             Cancel
           </button>
@@ -429,46 +429,46 @@ function RecipeCard({ recipe, onEdit, onView, onDelete, isEditing, onSave, onCan
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer group">
+    <div className="card card-hover p-6 cursor-pointer group">
       <div onClick={onView}>
-        <div className="flex items-start justify-between mb-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-semibold border ${
+        <div className="flex items-start justify-between mb-4">
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-sm font-semibold ${
             categoryColors[recipe.category as keyof typeof categoryColors] || categoryColors.comfort
           }`}>
             {recipe.title.charAt(0)}
           </div>
-          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(); }}
-              className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+              className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
               title="Edit"
             >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
               title="Delete"
             >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
             </button>
           </div>
         </div>
-        <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">{recipe.title}</h4>
-        <div className="text-xs text-gray-500 space-y-1">
+        <h4 className="font-semibold text-gray-900 mb-3 text-base">{recipe.title}</h4>
+        <div className="text-sm text-gray-500 space-y-2">
           <div className="flex items-center">
-            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             {recipe.cookingTime} • {recipe.servings} servings
           </div>
           <div className="flex items-center justify-between">
-            <span>{recipe.category}</span>
-            <span className={`px-2 py-1 rounded-full text-xs ${
+            <span className="capitalize">{recipe.category}</span>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
               recipe.type === 'lunch' ? 'bg-yellow-100 text-yellow-800' :
               recipe.type === 'dinner' ? 'bg-blue-100 text-blue-800' :
               'bg-green-100 text-green-800'
@@ -492,29 +492,43 @@ interface RecipeViewModalProps {
 function RecipeViewModal({ recipe, onClose, onEdit, onDelete }: RecipeViewModalProps) {
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-2xl mx-4 rounded-3xl shadow-2xl max-h-[90vh] flex flex-col">
+      <div className="bg-white w-full max-w-4xl mx-4 rounded-3xl shadow-2xl max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-8 border-b border-gray-200">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">{recipe.title}</h3>
-            <div className="text-sm text-gray-500 mt-1">
-              {recipe.cookingTime} • {recipe.servings} servings • {recipe.category}
+            <h3 className="text-2xl font-bold text-gray-900">{recipe.title}</h3>
+            <div className="text-gray-500 mt-2 flex items-center space-x-4">
+              <span className="flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {recipe.cookingTime}
+              </span>
+              <span className="flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {recipe.servings} servings
+              </span>
+              <span className="capitalize bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                {recipe.category}
+              </span>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             <button
               onClick={onEdit}
-              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+              className="p-3 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full"
+              className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -522,35 +536,45 @@ function RecipeViewModal({ recipe, onClose, onEdit, onDelete }: RecipeViewModalP
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3">Ingredients</h4>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">{recipe.ingredients}</pre>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <svg className="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Ingredients
+              </h4>
+              <div className="card p-6 bg-gray-50 border-gray-100">
+                <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">{recipe.ingredients}</pre>
               </div>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3">Instructions</h4>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">{recipe.instructions}</pre>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                Instructions
+              </h4>
+              <div className="card p-6 bg-gray-50 border-gray-100">
+                <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">{recipe.instructions}</pre>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50 rounded-b-3xl">
+        <div className="p-8 border-t border-gray-200 bg-gray-50 rounded-b-3xl">
           <div className="flex items-center justify-between">
             <button
               onClick={onDelete}
-              className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+              className="px-6 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"
             >
               Delete Recipe
             </button>
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors"
+              className="btn-secondary"
             >
               Close
             </button>
