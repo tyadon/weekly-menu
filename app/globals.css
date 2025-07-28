@@ -42,6 +42,20 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent horizontal scrolling on mobile */
+  overflow-x: hidden;
+}
+
+/* Improved touch target sizing for mobile */
+@media (max-width: 768px) {
+  button, input, textarea, select {
+    min-height: 44px;
+  }
+  
+  /* Better tap highlighting */
+  button, a {
+    -webkit-tap-highlight-color: rgba(255, 165, 0, 0.2);
+  }
 }
 
 /* Custom scrollbar */
@@ -165,6 +179,31 @@ body {
   }
 }
 
+/* Enhanced scale animation for better mobile feel */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Gradient loading animation */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out;
 }
@@ -202,6 +241,15 @@ body {
   );
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.4s ease-out;
+}
+
+.animate-gradient {
+  background-size: 400% 400%;
+  animation: gradientShift 3s ease infinite;
 }
 
 /* Custom utilities */
@@ -314,4 +362,119 @@ body {
   focus:ring-inset;
   focus:ring-orange-300;
   focus:ring-opacity-50;
+}
+
+/* Mobile-specific enhancements */
+@media (max-width: 640px) {
+  /* Better spacing for mobile */
+  .mobile-spacing {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  /* Larger touch targets */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Improved modal animations for mobile */
+  .mobile-modal-enter {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  /* Better text input sizing */
+  input, textarea, select {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Swipe gesture indicators */
+.swipe-indicator {
+  position: relative;
+}
+
+.swipe-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 2px;
+  background: rgba(255, 165, 0, 0.3);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.swipe-indicator:hover::after {
+  opacity: 1;
+}
+
+/* Progress indicators */
+.progress-ring {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+
+.progress-ring-circle {
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2;
+  fill: transparent;
+  transform-origin: 50% 50%;
+  transform: rotate(-90deg);
+}
+
+/* Enhanced card hover effects */
+.card-hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Success and error states */
+.state-success {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+}
+
+.state-error {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  color: white;
+}
+
+.state-warning {
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: white;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .border-gray-200 {
+    border-color: #000;
+  }
+  
+  .text-gray-600 {
+    color: #000;
+  }
+  
+  .bg-white\/95 {
+    background: #fff;
+  }
 } 

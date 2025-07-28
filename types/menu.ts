@@ -2,6 +2,24 @@ export interface Recipe {
   title?: string;
   ingredients: string;
   instructions: string;
+  cookingTime?: string;
+  category?: string;
+  servings?: number;
+}
+
+export interface SavedRecipe {
+  id: string;
+  title: string;
+  ingredients: string;
+  instructions: string;
+  cookingTime?: string;
+  servings?: number;
+  category: string;
+  type: 'lunch' | 'dinner' | 'both';
+  tags?: string[];
+  createdAt: string;
+  lastUsed?: string;
+  prepTime?: string; // For display in suggestions
 }
 
 export interface MealData {
@@ -26,4 +44,16 @@ export interface WeeklyMenu {
 export interface SaveStatus {
   status: 'idle' | 'saving' | 'saved' | 'error';
   message?: string;
+}
+
+export interface ShoppingListItem {
+  ingredient: string;
+  category?: string;
+  recipes: string[];
+}
+
+export interface ShoppingList {
+  weekStart: string;
+  items: ShoppingListItem[];
+  generatedAt: string;
 } 
